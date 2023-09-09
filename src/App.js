@@ -1,0 +1,53 @@
+import React from "react";
+import Navbar from "./components/Navbar";
+import Filter from "./components/Filter"
+import Cards from "./components/Cards"
+import Spinner from "./components/Spinner"
+
+import { apiUrl,filterData } from "./data";
+import { toast } from "react-toastify";
+import { useEffect,useState } from "react";
+
+const App = () => {
+  const [Courses, setCourses] = useState(null);
+  const [loading,  setLoading] = useState(true);
+  const [category, setCategory] =useState(filterData[0].title);
+
+  async function fetchData() {
+    setLoading(true);
+     try {
+      let response = await fetch(apiUrl);
+      let output = await response.json();
+      setCourses(output.data);
+
+     } catch (error) {
+        toast.error("Problem Detected");
+     }
+     setLoading(false);
+  }
+  
+  useEffect(()=>{fetchData()},[])
+   
+  return (<div className="min-h-screen flex flex-col bg-bgDark2">
+    <div>
+    <Navbar/>
+    </div>
+    <div className="bg-bgDark2">
+    <div> 
+      <Filter 
+       category = {category}
+      filterData={filterData}
+        setCategory={setCategory}
+      />
+    </div>
+    <div className='w-11/12 flex flex-wrap max-w-[1200px] space-x-4 gap-y-4 mx-auto py-4 justify-center'>
+    {
+      loading ? (<Spinner/> ) : (<Cards Courses={Courses} category={category}/>)
+    }
+    </div>
+    </div>
+  </div>);
+    
+};
+
+export default App;
